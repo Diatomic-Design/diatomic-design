@@ -1,24 +1,44 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
+import './style.css';
+import logo from '/logo-diatomic__icon--color.png';
 
 document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
+  <div class="logo-container">
+    <img src="${logo}" class="logo" alt="Logo" />
+    <div class="logo-background"></div>
   </div>
-`
+`;
 
-setupCounter(document.querySelector('#counter'))
+const logoElement = document.querySelector('.logo');
+let isHovered = false;
+let rotation = 0;
+let velocity = 0;
+let animationFrame;
+
+const updateRotation = () => {
+    velocity = Math.max(-10, Math.min(10, velocity));
+    rotation += velocity;
+    velocity *= 0.95; // friction
+    if (!isHovered) {
+        // Spring back to 0
+        const springForce = -rotation * 0.02;
+        velocity += springForce;
+    }
+    logoElement.style.transform = `rotate(${rotation}deg)`;
+    animationFrame = requestAnimationFrame(updateRotation);
+};
+
+logoElement.addEventListener('mouseover', () => {
+    isHovered = true;
+    velocity += 3;
+});
+
+logoElement.addEventListener('mouseout', () => {
+    isHovered = false;
+});
+
+animationFrame = requestAnimationFrame(updateRotation);
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    cancelAnimationFrame(animationFrame);
+});
